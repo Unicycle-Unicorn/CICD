@@ -14,5 +14,8 @@ jobs:
           username: root
           password: ${{ secrets.droplet_password }}
           script: |
+            docker compose ps -a
             docker compose pull
             docker compose up -d
+            cat compose.yaml
+            docker compose ps -a
