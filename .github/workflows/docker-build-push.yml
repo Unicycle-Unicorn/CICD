@@ -27,6 +27,8 @@ jobs:
       run: |
         echo "repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
     - uses: actions/checkout@v4
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
     - name: Build Docker Image
       working-directory: ${{ github.workspace }}/${{ inputs.subdirectory }}
       run: SOURCE_DATE_EPOCH=0 docker buildx build . --tag ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ inputs.tag }}
