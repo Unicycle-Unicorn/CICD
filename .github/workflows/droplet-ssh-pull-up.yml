@@ -2,7 +2,21 @@ name: Droplet SSH Docker Pull & Build
 
 on:
   workflow_call:
-      
+      inputs:
+        services:
+          description: Compose services to spin up (space delimited) - default all
+          required: false
+          type: string
+          default: ''
+        force:
+          description: Forces recreation of compose services
+          required: false
+          type: boolean
+          default: false
+
+env:
+  FORCE_FLAG: ${{ inputs.force && '--force-recreate' || '' }}
+
 jobs:
   ssh_droplet_update:
     name: SSH to Droplet and Update Docker
@@ -15,7 +29,7 @@ jobs:
           password: ${{ secrets.droplet_password }}
           script: |
             docker compose ps -a
-            docker compose pull
-            docker compose up -d
+            docker compose pull ${{ inputs.services }}
+            docker compose up -d ${{ env.FORCE_FLAG }} ${{ inputs.services }}
             cat compose.yaml
             docker compose ps -a
