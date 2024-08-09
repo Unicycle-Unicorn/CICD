@@ -27,11 +27,24 @@ jobs:
       run: |
         echo "repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
     - uses: actions/checkout@v4
-    - name: Add GitHub Packages as Nuget Source
-      run: dotnet nuget add source https://nuget.pkg.github.com/Unicycle-Unicorn/index.json -n UnicycleUnicorn --valid-authentication-types basic -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text;
+    - name: Create NuGet Config
+      run: |
+        echo '<?xml version="1.0" encoding="utf-8"?>' > NuGet.Config
+        echo '<configuration>' >> NuGet.Config
+        echo '  <packageSources>' >> NuGet.Config
+        echo '    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />' >> NuGet.Config
+        echo '    <add key="github" value="https://nuget.pkg.github.com/Unicycle-Unicorn/index.json" />' >> NuGet.Config
+        echo '  </packageSources>' >> NuGet.Config
+        echo '  <packageSourceCredentials>' >> NuGet.Config
+        echo '    <github>' >> NuGet.Config
+        echo '      <add key="Username" value="${{ github.actor }}" />' >> NuGet.Config
+        echo '      <add key="ClearTextPassword" value="${{ secrets.GITHUB_TOKEN }}" />' >> NuGet.Config
+        echo '    </github>' >> NuGet.Config
+        echo '  </packageSourceCredentials>' >> NuGet.Config
+        echo '</configuration>' >> NuGet.Config
     - name: Build Docker Image
       working-directory: ${{ github.workspace }}/${{ inputs.subdirectory }}
-      run: docker build . --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} --build-arg GITHUB_USER=UnicycleUnicorn --build-arg ADD_NUGET_SOURCE=true --tag ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ inputs.tag }}
+      run: docker build . --tag ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ inputs.tag }}
     - name: Login to GitHub Packages
       uses: docker/login-action@v3
       with:
