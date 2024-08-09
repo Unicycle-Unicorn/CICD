@@ -44,7 +44,7 @@ jobs:
         echo '  </packageSourceCredentials>' >> NuGet.Config
         echo '</configuration>' >> NuGet.Config
         pwd
-        ll
+        ls
     - name: Build Docker Image
       working-directory: ${{ github.workspace }}/${{ inputs.subdirectory }}
       run: docker build . --tag ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ inputs.tag }}
