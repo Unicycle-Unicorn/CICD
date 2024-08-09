@@ -28,6 +28,7 @@ jobs:
         echo "repository=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
     - uses: actions/checkout@v4
     - name: Create NuGet Config
+      working-directory: ${{ github.workspace }}/${{ inputs.subdirectory }}
       run: |
         echo '<?xml version="1.0" encoding="utf-8"?>' > NuGet.Config
         echo '<configuration>' >> NuGet.Config
@@ -42,6 +43,8 @@ jobs:
         echo '    </github>' >> NuGet.Config
         echo '  </packageSourceCredentials>' >> NuGet.Config
         echo '</configuration>' >> NuGet.Config
+        pwd
+        ll
     - name: Build Docker Image
       working-directory: ${{ github.workspace }}/${{ inputs.subdirectory }}
       run: docker build . --tag ghcr.io/${{ steps.lower-repo.outputs.repository }}:${{ inputs.tag }}
